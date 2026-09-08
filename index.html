@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Side Hustle Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #16a34a;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 14px;
+            --transition: all 0.25s ease;
+        }
+
+        body.dark-mode {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --primary: #3b82f6;
+            --primary-hover: #60a5fa;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 760px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            padding: 36px;
+            box-sizing: border-box;
+            height: fit-content;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            color: var(--text-main);
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+
+        .icon-btn:hover {
+            border-color: var(--primary);
+            background: var(--card-bg);
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 10px 14px;
+            border-radius: 8px;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Quiz Styles */
+        .step { display: none; }
+        .step.active { display: block; }
+
+        .question-title {
+            font-weight: 600;
+            font-size: 1.15rem;
+            margin-bottom: 16px;
+        }
+
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .option-card {
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            text-align: left;
+            font-family: inherit;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .option-card.selected {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.05);
+            font-weight: 600;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+        }
+
+        button.btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        button.btn:hover { background-color: var(--primary-hover); }
+        button.btn:disabled { background-color: var(--border); cursor: not-allowed; opacity: 0.7; }
+
+        button.btn-secondary {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+        button.btn-secondary:hover { background-color: var(--bg-color); color: var(--text-main); }
+
+        .result-box {
+            background: var(--bg-color);
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 24px;
+            border-top: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            width: 100%;
+            background: var(--border);
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 33%;
+            transition: width 0.3s ease;
+        }
+
+        /* Tracker Styles */
+        .tracker-progress-bar {
+            background: var(--border);
+            border-radius: 6px;
+            height: 8px;
+            width: 100%;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+
+        .tracker-fill {
+            background: var(--success);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stats-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .day-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: var(--card-bg);
+            transition: var(--transition);
+        }
+
+        .day-card.completed {
+            border-color: var(--success);
+            background: rgba(22, 163, 74, 0.03);
+        }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+        }
+
+        .day-title {
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .day-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--success);
+        }
+
+        .day-goal {
+            margin: 8px 0 0 32px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .reflection-box {
+            margin: 12px 0 0 32px;
+        }
+
+        .reflection-box textarea {
+            width: 100%;
+            max-width: 100%;
+            height: 55px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            background: var(--bg-color);
+            color: var(--text-main);
+            box-sizing: border-box;
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        .reflection-box textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Prompt Generator Styles */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .prompt-output-box {
+            width: 100%;
+            height: 180px;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-main);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.85rem;
+            box-sizing: border-box;
+            resize: vertical;
+            line-height: 1.5;
+            transition: var(--transition);
+        }
+
+        .prompt-output-box:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .actions-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        button.btn-reset {
+            background: transparent;
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        button.btn-reset:hover { background: rgba(239, 68, 68, 0.1); }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--text-main);
+            color: var(--card-bg);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: var(--transition);
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>Side Hustle Command Center</h1>
+            <p class="subtitle">Discover your optimal digital path, execute your launch plan, and generate AI copy.</p>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="toggleDarkMode()" id="darkModeBtn" title="Toggle Dark Mode">🌙</button>
+            <button class="icon-btn" onclick="exportSummary()" title="Export Summary to Clipboard">📋</button>
+        </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('selector')">1. Side Hustle Selector</button>
+        <button class="tab-btn" onclick="switchTab('tracker')">2. 7-Day Action Tracker</button>
+        <button class="tab-btn" onclick="switchTab('prompt')">3. AI Prompt Generator</button>
+    </div>
+
+    <!-- TAB 1: SIDE HUSTLE SELECTOR -->
+    <div class="tab-pane active" id="selectorPane">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Step 1 -->
+        <div class="step active" id="quizStep1">
+            <div class="question-title">1. What is your preferred day-to-day interaction style?</div>
+            <div class="options-group">
+                <button class="option-card" onclick="selectQuizOption(1, 'A', this)">One-on-one consulting, advising, and client strategy sessions</button>
+                <button class="option-card" onclick="selectQuizOption(1, 'B', this)">Quiet solo writing, deep-dive drafting, and structured documentation</button>
+                <button class="option-card" onclick="selectQuizOption(1, 'C', this)">Organizing digital resources, curating asset libraries, and building templates</button>
+                <button class="option-card" onclick="selectQuizOption(1, 'D', this)">Creative asset generation, media production, and interactive workflows</button>
+            </div>
+            <div class="btn-container">
+                <div></div>
+                <button class="btn" id="nextQuiz1" onclick="nextQuizStep()" disabled>Next</button>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step" id="quizStep2">
+            <div class="question-title">2. Which core strength best describes your professional comfort zone?</div>
+            <div class="options-group">
+                <button class="option-card" onclick="selectQuizOption(2, 'A', this)">Mentoring others and solving complex operational blocks</button>
+                <button class="option-card" onclick="selectQuizOption(2, 'B', this)">Storytelling, persuasive copywriting, and clear communication</button>
+                <button class="option-card" onclick="selectQuizOption(2, 'C', this)">Systemizing workflows, curation, and information architecture</button>
+                <button class="option-card" onclick="selectQuizOption(2, 'D', this)">Visual design, audio production, and prompt engineering</button>
+            </div>
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="prevQuizStep()">Back</button>
+                <button class="btn" id="nextQuiz2" onclick="nextQuizStep()" disabled>Next</button>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step" id="quizStep3">
+            <div class="question-title">3. How do you prefer to manage your working time?</div>
+            <div class="options-group">
+                <button class="option-card" onclick="selectQuizOption(3, 'A', this)">Structured, high-value client blocks with dedicated weekly hours</button>
+                <button class="option-card" onclick="selectQuizOption(3, 'B', this)">Flexible, asynchronous writing sprints on my own schedule</button>
+                <button class="option-card" onclick="selectQuizOption(3, 'C', this)">Passive setup where digital products sell automatically 24/7</button>
+                <button class="option-card" onclick="selectQuizOption(3, 'D', this)">Project-based creative sprints with immediate, tangible deliverables</button>
+            </div>
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="prevQuizStep()">Back</button>
+                <button class="btn" id="nextQuiz3" onclick="showQuizResults()" disabled>See My Result</button>
+            </div>
+        </div>
+
+        <!-- Results Step -->
+        <div class="step" id="quizResultStep">
+            <div class="result-box">
+                <div class="result-title" id="resultTitle">Analyzing...</div>
+                <p id="resultDesc">Please wait while we match your profile.</p>
+            </div>
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="restartQuiz()">Start Over</button>
+                <button class="btn" onclick="switchTab('prompt')">Generate AI Launch Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: 7-DAY ACTION TRACKER -->
+    <div class="tab-pane" id="trackerPane">
+        <div class="tracker-progress-bar">
+            <div class="tracker-fill" id="trackerFill"></div>
+        </div>
+        <div class="stats-text" id="trackerStats">0 of 7 days completed (0%)</div>
+
+        <div id="daysContainer">
+            <!-- Populated via JS -->
+        </div>
+
+        <div class="actions-footer">
+            <button class="btn-reset" onclick="resetTracker()">Reset Progress</button>
+            <button class="btn" onclick="switchTab('prompt')">Go to AI Prompt Generator</button>
+        </div>
+    </div>
+
+    <!-- TAB 3: AI PROMPT GENERATOR -->
+    <div class="tab-pane" id="promptPane">
+        <div class="question-title">AI Launch Copy Prompt Generator</div>
+        <p class="subtitle" style="margin-bottom: 20px;">Instantly generate customized, professional AI prompts tailored to your income stream.</p>
+
+        <div class="form-group">
+            <label class="form-label" for="promptStreamSelect">Select Your Income Stream:</label>
+            <select id="promptStreamSelect" class="form-select" onchange="updateGeneratedPrompt()">
+                <option value="Stream A: The Trusted Digital Consultant">Stream A: The Trusted Digital Consultant</option>
+                <option value="Stream B: The Freelance Wordsmith">Stream B: The Freelance Wordsmith</option>
+                <option value="Stream C: The Digital Product Curator">Stream C: The Digital Product Curator</option>
+                <option value="Stream D: The Personalized Content Creator">Stream D: The Personalized Content Creator</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="promptGoalSelect">Select Marketing Goal / Copy Type:</label>
+            <select id="promptGoalSelect" class="form-select" onchange="updateGeneratedPrompt()">
+                <option value="Launch Announcement Post (Social Media)">Launch Announcement Post (Social Media)</option>
+                <option value="Email Welcome & Delivery Sequence">Email Welcome & Delivery Sequence</option>
+                <option value="Landing Page Hook & Value Proposition">Landing Page Hook & Value Proposition</option>
+                <option value="FAQ & Objection Handling Guide">FAQ & Objection Handling Guide</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="generatedPromptOutput">Ready-to-Use AI Prompt:</label>
+            <textarea id="generatedPromptOutput" class="prompt-output-box" readonly></textarea>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn btn-secondary" onclick="switchTab('tracker')">Back to Tracker</button>
+            <button class="btn" onclick="copyGeneratedPrompt()">Copy Prompt to Clipboard</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toastMessage">Copied to clipboard!</div>
+
+<script>
+    // --- DARK MODE LOGIC ---
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('commandCenterDarkMode', isDark);
+        document.getElementById('darkModeBtn').innerText = isDark ? '☀️' : '🌙';
+    }
+
+    if (localStorage.getItem('commandCenterDarkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('darkModeBtn').innerText = '☀️';
+    }
+
+    // --- TOAST NOTIFICATION ---
+    function showToast(message) {
+        const toast = document.getElementById('toastMessage');
+        toast.innerText = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // --- AI PROMPT GENERATOR LOGIC ---
+    function updateGeneratedPrompt() {
+        const stream = document.getElementById('promptStreamSelect').value;
+        const goal = document.getElementById('promptGoalSelect').value;
+        let promptText = "";
+
+        if (goal.includes("Social Media")) {
+            promptText = `Act as an expert copywriter. Write an engaging, high-converting social media launch post for "${stream}". \n\nRequirements:\n- Hook the reader immediately with a relatable professional pain point.\n- Clearly explain the core benefit of this stream.\n- Include a compelling call-to-action (CTA) inviting followers to comment or check the bio link.\n- Tone: Authoritative, welcoming, and inspiring. Keep it under 200 words.`;
+        } else if (goal.includes("Email")) {
+            promptText = `Act as an expert email marketer. Write a warm, professional welcome and delivery email sequence for clients who just purchased or signed up for "${stream}".\n\nRequirements:\n- Subject line options (curiosity-driven and clear).\n- Immediate delivery link placeholder and onboarding steps.\n- Next-level engagement steps to build long-term trust.\n- Tone: Professional, encouraging, and structured.`;
+        } else if (goal.includes("Landing Page")) {
+            promptText = `Act as a conversion rate optimization expert. Write a high-impact headline, subheadline, and 3 key value proposition bullets for a landing page centered on "${stream}".\n\nRequirements:\n- Focus on clarity, speed of transformation, and eliminating friction.\n- Highlight why this specific model is unique and high-leverage.\n- Tone: Clean, confident, and professional.`;
+        } else {
+            promptText = `Act as a business strategist. Create a comprehensive FAQ and objection-handling guide for prospective clients or buyers exploring "${stream}".\n\nRequirements:\n- Address eliminations of time concerns, tech complexity doubts, and value justification.\n- Provide 4 clear questions and reassuring, concise answers.\n- Tone: Empathetic, grounded, and clear.`;
+        }
+
+        document.getElementById('generatedPromptOutput').value = promptText;
+    }
+
+    function copyGeneratedPrompt() {
+        const text = document.getElementById('generatedPromptOutput').value;
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('AI Prompt copied to clipboard!');
+        });
+    }
+
+    // --- EXPORT SUMMARY ---
+    function exportSummary() {
+        const savedQuiz = localStorage.getItem('commandCenterQuizResult') || 'Not completed yet';
+        const savedTracker = JSON.parse(localStorage.getItem('commandCenterTracker')) || {};
+        
+        let report = `=== SIDE HUSTLE COMMAND CENTER SUMMARY ===\n\n`;
+        report += `RECOMMENDED STREAM:\n${savedQuiz}\n\n`;
+        report += `--- 7-DAY ACTION TRACKER PROGRESS ---\n`;
+        
+        trackerData.forEach(item => {
+            const st = savedTracker[item.day] || { completed: false, notes: '' };
+            const status = st.completed ? '[COMPLETED]' : '[PENDING]';
+            report += `Day ${item.day}: ${item.title} ${status}\n`;
+            if (st.notes) report += `  Notes: ${st.notes}\n`;
+        });
+
+        navigator.clipboard.writeText(report).then(() => {
+            showToast('Summary copied to clipboard!');
+        });
+    }
+
+    // --- TAB SWITCHING LOGIC ---
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+        if (tabName === 'selector') {
+            document.querySelector('.tab-nav button:nth-child(1)').classList.add('active');
+            document.getElementById('selectorPane').classList.add('active');
+        } else if (tabName === 'tracker') {
+            document.querySelector('.tab-nav button:nth-child(2)').classList.add('active');
+            document.getElementById('trackerPane').classList.add('active');
+            renderTracker();
+        } else if (tabName === 'prompt') {
+            document.querySelector('.tab-nav button:nth-child(3)').classList.add('active');
+            document.getElementById('promptPane').classList.add('active');
+            updateGeneratedPrompt();
+        }
+    }
+
+    // --- QUIZ LOGIC ---
+    let currentQuizStep = 1;
+    const userAnswers = { 1: null, 2: null, 3: null };
+
+    const streams = {
+        A: {
+            title: "Stream A: The Trusted Digital Consultant",
+            desc: "Your preferences point strongly toward high-leverage advisory work. You excel at guiding clients one-on-one, troubleshooting custom challenges, and packaging your expertise into high-ticket advisory packages."
+        },
+        B: {
+            title: "Stream B: The Freelance Wordsmith",
+            desc: "You thrive in structured, independent writing and communication environments. Your ideal path centers on crafting persuasive copy, newsletters, blog assets, and digital guidebooks that educate and convert."
+        },
+        C: {
+            title: "Stream C: The Digital Product Curator",
+            desc: "You enjoy organizing systems, curating resources, and building scalable assets. Your best fit is creating plug-and-play digital toolkits, spreadsheet templates, and automated info-products that generate passive sales."
+        },
+        D: {
+            title: "Stream D: The Personalized Content Creator",
+            desc: "You lean naturally toward creative production, prompt workflows, and media assets. Your ideal monetization path involves building bespoke digital utilities, media kits, or specialized AI-assisted workflows."
+        }
+    };
+
+    function selectQuizOption(stepNum, val, el) {
+        el.parentElement.querySelectorAll('.option-card').forEach(b => b.classList.remove('selected'));
+        el.classList.add('selected');
+        userAnswers[stepNum] = val;
+        document.getElementById(`nextQuiz${stepNum}`).disabled = false;
+    }
+
+    function updateQuizProgress() {
+        const fill = document.getElementById('progressFill');
+        if (currentQuizStep === 1) fill.style.width = '33%';
+        if (currentQuizStep === 2) fill.style.width = '66%';
+        if (currentQuizStep >= 3) fill.style.width = '100%';
+    }
+
+    function nextQuizStep() {
+        document.getElementById(`quizStep${currentQuizStep}`).classList.remove('active');
+        currentQuizStep++;
+        document.getElementById(`quizStep${currentQuizStep}`).classList.add('active');
+        updateQuizProgress();
+    }
+
+    function prevQuizStep() {
+        document.getElementById(`quizStep${currentQuizStep}`).classList.remove('active');
+        currentQuizStep--;
+        document.getElementById(`quizStep${currentQuizStep}`).classList.add('active');
+        updateQuizProgress();
+    }
+
+    function showQuizResults() {
+        document.getElementById(`quizStep${currentQuizStep}`).classList.remove('active');
+        document.getElementById('quizResultStep').classList.add('active');
+        updateQuizProgress();
+
+        const counts = { A: 0, B: 0, C: 0, D: 0 };
+        Object.values(userAnswers).forEach(v => { if (counts[v] !== undefined) counts[v]++; });
+
+        let best = 'A', max = -1;
+        for (const [k, c] of Object.entries(counts)) {
+            if (c > max) { max = c; best = k; }
+        }
+
+        const titleText = streams[best].title;
+        const descText = streams[best].desc;
+
+        document.getElementById('resultTitle').innerText = titleText;
+        document.getElementById('resultDesc').innerText = descText;
+
+        // Auto-select stream in prompt generator dropdown
+        const streamSelect = document.getElementById('promptStreamSelect');
+        for (let i = 0; i < streamSelect.options.length; i++) {
+            if (streamSelect.options[i].value.includes(`Stream ${best}`)) {
+                streamSelect.selectedIndex = i;
+                break;
+            }
+        }
+
+        localStorage.setItem('commandCenterQuizResult', `${titleText}\n${descText}`);
+    }
+
+    function restartQuiz() {
+        document.getElementById('quizResultStep').classList.remove('active');
+        currentQuizStep = 1;
+        document.getElementById('quizStep1').classList.add('active');
+        for (let i = 1; i <= 3; i++) {
+            userAnswers[i] = null;
+            document.querySelectorAll(`#quizStep${i} .option-card`).forEach(b => b.classList.remove('selected'));
+            document.getElementById(`nextQuiz${i}`).disabled = true;
+        }
+        localStorage.removeItem('commandCenterQuizResult');
+        updateQuizProgress();
+    }
+
+    // --- TRACKER LOGIC ---
+    const trackerData = [
+        { day: 1, title: "Define Your Core Offering", goal: "Clarify your niche, identify your target audience, and select your monetization model." },
+        { day: 2, title: "Structure Your Asset Outline", goal: "Draft the skeleton, table of contents, or structural framework for your product or service." },
+        { day: 3, title: "Build the Core Material", goal: "Write out primary content, guides, templates, or consulting scripts required for delivery." },
+        { day: 4, title: "Design Landing Page / Wrapper", goal: "Set up your clean presentation layer, sales page copy, or user interface wrapper." },
+        { day: 5, title: "Configure Delivery & Checkout", goal: "Connect payment links, digital store download mechanics, or booking calendars." },
+        { day: 6, title: "Draft Launch Communications", goal: "Write announcement posts, email sequences, or social share templates for Day 7." },
+        { day: 7, title: "Go Live & Share", goal: "Publish your offering, initiate outreach, and officially open your doors." }
+    ];
+
+    function renderTracker() {
+        const container = document.getElementById('daysContainer');
+        const saved = JSON.parse(localStorage.getItem('commandCenterTracker')) || {};
+        container.innerHTML = '';
+        let completed = 0;
+
+        trackerData.forEach(item => {
+            const st = saved[item.day] || { completed: false, notes: '' };
+            if (st.completed) completed++;
+
+            const card = document.createElement('div');
+            card.className = `day-card ${st.completed ? 'completed' : ''}`;
+            card.innerHTML = `
+                <div class="day-header">
+                    <div class="day-title">
+                        <input type="checkbox" class="day-checkbox" ${st.completed ? 'checked' : ''} onchange="toggleDay(${item.day}, this)">
+                        <span>Day ${item.day}: ${item.title}</span>
+                    </div>
+                </div>
+                <div class="day-goal">${item.goal}</div>
+                <div class="reflection-box">
+                    <textarea placeholder="Add daily reflections or notes..." oninput="saveNotes(${item.day}, this)">${st.notes}</textarea>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        const pct = Math.round((completed / 7) * 100);
+        document.getElementById('trackerFill').style.width = `${pct}%`;
+        document.getElementById('trackerStats').innerText = `${completed} of 7 days completed (${pct}%)`;
+    }
+
+    function toggleDay(dayNum, cb) {
+        const saved = JSON.parse(localStorage.getItem('commandCenterTracker')) || {};
+        if (!saved[dayNum]) saved[dayNum] = { completed: false, notes: '' };
+        saved[dayNum].completed = cb.checked;
+        localStorage.setItem('commandCenterTracker', JSON.stringify(saved));
+        renderTracker();
+    }
+
+    function saveNotes(dayNum, ta) {
+        const saved = JSON.parse(localStorage.getItem('commandCenterTracker')) || {};
+        if (!saved[dayNum]) saved[dayNum] = { completed: false, notes: '' };
+        saved[dayNum].notes = ta.value;
+        localStorage.setItem('commandCenterTracker', JSON.stringify(saved));
+    }
+
+    function resetTracker() {
+        if (confirm("Are you sure you want to reset all progress and notes?")) {
+            localStorage.removeItem('commandCenterTracker');
+            renderTracker();
+            showToast('Tracker progress reset.');
+        }
+    }
+
+    renderTracker();
+    updateGeneratedPrompt();
+</script>
+
+</body>
+</html>
